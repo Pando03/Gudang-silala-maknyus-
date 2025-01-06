@@ -1,274 +1,567 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
     <meta charset="UTF-8">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Manajemen Pergudangan</title>
+
     <style>
+
         body {
+
             font-family: 'Arial', sans-serif;
+
             margin: 0;
+
             padding: 0;
+
             background: url('https://via.placeholder.com/1920x1080') no-repeat center center fixed;
+
             background-size: cover;
+
             display: flex;
+
             justify-content: center;
+
             align-items: center;
+
             height: 100vh;
+
         }
+
         .container {
+
             background: rgba(255, 255, 255, 0.9);
+
             padding: 20px;
+
             border-radius: 8px;
+
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+
             width: 400px;
+
         }
+
         h1 {
+
             text-align: center;
+
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
             margin-bottom: 20px;
+
             color: #333;
+
         }
+
         form {
+
             display: flex;
+
             flex-direction: column;
+
             gap: 10px;
+
         }
+
         input, button {
+
             padding: 10px;
+
             font-size: 16px;
+
             border: 1px solid #ddd;
+
             border-radius: 4px;
+
         }
+
         button {
+
             background-color: #4caf50;
+
             color: white;
+
             cursor: pointer;
+
             border: none;
+
         }
+
         button:hover {
+
             background-color: #45a049;
+
         }
+
         table {
+
             width: 100%;
+
             border-collapse: collapse;
+
             margin-top: 20px;
+
         }
+
         table, th, td {
+
             border: 1px solid #ddd;
+
         }
+
         th, td {
+
             padding: 10px;
+
             text-align: left;
+
         }
+
         .action-buttons {
+
             display: flex;
+
             gap: 5px;
+
         }
+
         .action-buttons button {
+
             flex: 1;
+
         }
+
         #loginForm {
+
             display: flex;
+
             flex-direction: column;
+
             gap: 10px;
+
         }
+
         .order-button {
+
             margin-top: 20px;
+
             text-align: center;
+
         }
+
         .order-button a {
+
             display: inline-block;
+
             padding: 10px 20px;
+
             background-color: #25d366;
+
             color: white;
+
             text-decoration: none;
+
             border-radius: 4px;
+
             font-size: 16px;
+
         }
+
         .order-button a:hover {
+
             background-color: #1ebc5a;
+
         }
+
     </style>
+
 </head>
+
 <body>
+
     <div class="container" id="loginContainer">
+
         <h1>Login Admin</h1>
+
         <form id="loginForm">
+
             <input type="text" id="username" placeholder="Username" required>
+
             <input type="password" id="password" placeholder="Password" required>
+
             <button type="submit">Login</button>
+
         </form>
+
     </div>
+
+
 
     <div class="container" id="adminContainer" style="display: none;">
+
         <h1>Manajemen Pergudangan</h1>
+
         <form id="addItemForm">
+
             <input type="text" id="itemName" placeholder="Nama Barang" required>
+
             <input type="number" id="itemQuantity" placeholder="Jumlah Barang" min="1" required>
+
             <button type="submit">Tambah Barang</button>
+
         </form>
+
         <table>
+
             <thead>
+
                 <tr>
+
                     <th>Nama Barang</th>
+
                     <th>Jumlah</th>
+
                     <th>Aksi</th>
+
                 </tr>
+
             </thead>
+
             <tbody id="itemTable">
+
                 <!-- Barang akan ditambahkan di sini -->
+
             </tbody>
+
         </table>
+
     </div>
+
+
 
     <div class="container" id="userContainer" style="display: none;">
+
         <h1>Daftar Barang</h1>
+
         <table>
+
             <thead>
+
                 <tr>
+
                     <th>Nama Barang</th>
+
                     <th>Jumlah</th>
+
                 </tr>
+
             </thead>
+
             <tbody id="userItemTable">
+
                 <!-- Barang akan ditambahkan di sini -->
+
             </tbody>
+
         </table>
+
         <div class="order-button">
+
             <a href="https://wa.me/+6283185632038?text=Halo%20Admin,%20saya%20ingin%20memesan%20barang." target="_blank">Klik untuk Memesan</a>
+
         </div>
+
     </div>
 
+
+
     <script>
+
         const loginForm = document.getElementById('loginForm');
+
         const loginContainer = document.getElementById('loginContainer');
+
         const adminContainer = document.getElementById('adminContainer');
+
         const userContainer = document.getElementById('userContainer');
+
         const addItemForm = document.getElementById('addItemForm');
+
         const itemTable = document.getElementById('itemTable');
+
         const userItemTable = document.getElementById('userItemTable');
 
+
+
         // Dummy admin credentials
+
         const ADMIN_USERNAME = 'vando';
+
         const ADMIN_PASSWORD = '030803';
 
+
+
         // Load data from localStorage on page load
+
         document.addEventListener('DOMContentLoaded', () => {
+
             const savedItems = JSON.parse(localStorage.getItem('items')) || [];
+
             savedItems.forEach(item => {
+
                 addItemToTable(item.name, item.quantity, false);
+
                 addItemToUserTable(item.name, item.quantity);
+
             });
+
+            // Pastikan tabel user diperbarui setelah halaman dimuat
+            updateUserTable();
+
         });
+
+
 
         loginForm.addEventListener('submit', (e) => {
+
             e.preventDefault();
+
+
 
             const username = document.getElementById('username').value;
+
             const password = document.getElementById('password').value;
 
+
+
             if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+
                 loginContainer.style.display = 'none';
+
                 adminContainer.style.display = 'block';
+
             } else {
+
                 loginContainer.style.display = 'none';
+
                 userContainer.style.display = 'block';
+
             }
+
         });
+
+
 
         addItemForm.addEventListener('submit', (e) => {
+
             e.preventDefault();
 
+
+
             const itemName = document.getElementById('itemName').value.trim();
+
             const itemQuantity = parseInt(document.getElementById('itemQuantity').value, 10);
 
+
+
             if (itemName === '' || isNaN(itemQuantity) || itemQuantity < 1) {
+
                 alert('Harap masukkan nama dan jumlah barang dengan benar!');
+
                 return;
+
             }
 
+
+
             addItemToTable(itemName, itemQuantity, true);
+
             addItemToUserTable(itemName, itemQuantity);
 
+
+
             addItemForm.reset();
+
         });
 
+
+
         function addItemToTable(name, quantity, save = true) {
+
             const row = document.createElement('tr');
 
+
+
             const nameCell = document.createElement('td');
+
             nameCell.textContent = name;
 
+
+
             const quantityCell = document.createElement('td');
+
             quantityCell.textContent = quantity;
 
+
+
             const actionsCell = document.createElement('td');
+
             actionsCell.className = 'action-buttons';
 
+
+
             const increaseButton = document.createElement('button');
+
             increaseButton.textContent = '+';
+
             increaseButton.onclick = () => {
+
                 quantityCell.textContent = parseInt(quantityCell.textContent, 10) + 1;
+
                 updateLocalStorage();
+
+                updateUserTable(); // Pastikan user table diperbarui setelah perubahan
             };
+
+
 
             const decreaseButton = document.createElement('button');
+
             decreaseButton.textContent = '-';
+
             decreaseButton.onclick = () => {
+
                 const currentQuantity = parseInt(quantityCell.textContent, 10);
+
                 if (currentQuantity > 1) {
+
                     quantityCell.textContent = currentQuantity - 1;
+
                     updateLocalStorage();
+
+                    updateUserTable(); // Pastikan user table diperbarui setelah perubahan
                 } else {
+
                     alert('Jumlah barang tidak boleh kurang dari 1.');
+
                 }
+
             };
+
+
 
             const deleteButton = document.createElement('button');
+
             deleteButton.textContent = 'Hapus';
+
             deleteButton.onclick = () => {
+
                 row.remove();
+
                 updateLocalStorage();
+
+                updateUserTable(); // Pastikan user table diperbarui setelah perubahan
             };
 
+
+
             actionsCell.appendChild(increaseButton);
+
             actionsCell.appendChild(decreaseButton);
+
             actionsCell.appendChild(deleteButton);
 
+
+
             row.appendChild(nameCell);
+
             row.appendChild(quantityCell);
+
             row.appendChild(actionsCell);
+
+
 
             itemTable.appendChild(row);
 
+
+
             if (save) updateLocalStorage();
+
+            updateUserTable(); // Memperbarui tabel user setelah perubahan
         }
 
+
+
         function addItemToUserTable(name, quantity) {
+
             const row = document.createElement('tr');
 
+
+
             const nameCell = document.createElement('td');
+
             nameCell.textContent = name;
 
+
+
             const quantityCell = document.createElement('td');
+
             quantityCell.textContent = quantity;
 
+
+
             row.appendChild(nameCell);
+
             row.appendChild(quantityCell);
 
+
+
             userItemTable.appendChild(row);
+
+        }
+
+
+
+        function updateUserTable() {
+
+            // Clear tabel barang user terlebih dahulu
+            userItemTable.innerHTML = '';
+            
+            // Ambil data barang dari localStorage
+            const savedItems = JSON.parse(localStorage.getItem('items')) || [];
+            
+            // Tambahkan barang ke tabel user
+            savedItems.forEach(item => {
+                addItemToUserTable(item.name, item.quantity);
+            });
         }
 
         function updateLocalStorage() {
+
             const items = [];
+
             itemTable.querySelectorAll('tr').forEach(row => {
+
                 const name = row.children[0].textContent;
+
                 const quantity = parseInt(row.children[1].textContent, 10);
+
                 items.push({ name, quantity });
+
             });
+
             localStorage.setItem('items', JSON.stringify(items));
+
         }
+
     </script>
+
 </body>
+
 </html>
